@@ -1,0 +1,51 @@
+name: Stripe Integration Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/lib/stripe/**'
+      - 'src/app/api/stripe/**'
+      - 'test-stripe*.js'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'src/lib/stripe/**'
+      - 'src/app/api/stripe/**'
+      - 'test-stripe*.js'
+
+jobs:
+  stripe-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Test Stripe connection
+      run: npm run stripe:test
+      env:
+        STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+        STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+    
+    - name: Test Stripe price verification
+      run: npm run stripe:prices
+      env:
+        STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+    
+    - name: Test complete Stripe flow
+      run: node test-complete-flow.js
+      env:
+        STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
