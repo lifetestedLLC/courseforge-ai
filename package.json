@@ -1,0 +1,50 @@
+{
+  "name": "courseforge-ai",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "validate": "node scripts/validate-setup.js",
+    "test:integration": "node test-complete-flow.js",
+    "test:stripe": "node test-stripe.js",
+    "stripe:connection": "node -r dotenv/config -e 'require(\"./src/lib/stripe-test\").testStripeConnection()'",
+    "stripe:prices": "node -r dotenv/config -e 'require(\"./src/lib/stripe-test\").verifyPriceIds()'",
+    "stripe:webhooks": "stripe listen --forward-to localhost:3000/api/stripe/webhook",
+    "stripe:webhooks:test": "node -r dotenv/config -e 'require(\"./src/lib/stripe-test\").getTestWebhookEvents()'",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "db:reset": "prisma migrate reset --force",
+    "setup": "npm run db:push && npm run validate",
+    "test": "npm run validate && npm run test:integration"
+  },
+  "dependencies": {
+    "@next-auth/prisma-adapter": "^1.0.7",
+    "@prisma/client": "^5.7.1",
+    "dotenv": "^16.3.1",
+    "lucide-react": "^0.294.0",
+    "next": "14.0.4",
+    "next-auth": "^4.24.13",
+    "openai": "^4.20.1",
+    "react": "^18",
+    "react-dom": "^18",
+    "stripe": "^14.7.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.0.1",
+    "eslint": "^8",
+    "eslint-config-next": "14.0.4",
+    "node-fetch": "^2.7.0",
+    "postcss": "^8",
+    "prisma": "^5.7.1",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5"
+  }
+}

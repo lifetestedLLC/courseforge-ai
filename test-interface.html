@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Interface Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; }
+        .plan { border: 1px solid #ccc; padding: 1rem; margin: 1rem; border-radius: 5px; }
+        button { background: #3b82f6; color: white; padding: 0.5rem 1rem; border: none; border-radius: 3px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Simple Interface Test</h1>
+    
+    <div class="plan">
+        <h3>Starter Plan - $15/month</h3>
+        <button onclick="startCheckout('STARTER')">Get Started</button>
+    </div>
+    
+    <div class="plan">
+        <h3>Creator Plan - $49/month</h3>
+        <button onclick="startCheckout('CREATOR')">Get Started</button>
+    </div>
+    
+    <div class="plan">
+        <h3>Business Plan - $79/month</h3>
+        <button onclick="startCheckout('BUSINESS')">Get Started</button>
+    </div>
+    
+    <script>
+        function startCheckout(plan) {
+            window.location.href = `http://localhost:3001/api/stripe/checkout?plan=${plan}`;
+        }
+    </script>
+</body>
+</html>
