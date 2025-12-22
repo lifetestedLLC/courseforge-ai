@@ -1,0 +1,48 @@
+# cPanel App Deployment configuration for CourseForge (Next.js)
+# - Installs dependencies, builds the Next.js app, then starts it with PM2
+# - Customize environment variables under the "environment.variables" section
+
+deployment:
+  predeploy:
+    - echo "Predeploy: checking node & npm versions"
+    - node --version || true
+    - npm --version || true
+
+  tasks:
+    - echo "Installing dependencies"
+    - npm ci
+
+    - echo "Building Next.js app"
+    - npm run build
+
+    - echo "Setting NODE_ENV=production for run-time"
+    - export NODE_ENV=production
+
+    - echo "Ensure PM2 is available"
+    - npm install -g pm2 || true
+
+    - echo "Start or restart app with PM2"
+    - pm2 start npm --name "courseforge-ai" -- start || pm2 restart courseforge-ai || true
+    - pm2 save || true
+
+    - echo "Copy built files to cPanel public_html (DEPLOYPATH configurable via environment)"
+    - DEPLOYPATH="${DEPLOYPATH:-/home/thatguyzi/public_html/}"
+    - echo "Using DEPLOYPATH=$DEPLOYPATH"
+    - mkdir -p "$DEPLOYPATH"
+    - if command -v rsync >/dev/null 2>&1; then rsync -av --delete --exclude='.git' --exclude='node_modules' --exclude='.env' --exclude='*.log' . "$DEPLOYPATH"; else /bin/cp -R * "$DEPLOYPATH"; fi
+
+  postdeploy:
+    - echo "Postdeploy: listing PM2 processes"
+    - pm2 ls || true
+
+environment:
+  variables:
+    NODE_ENV: production
+    PORT: '3000'
+    DEPLOYPATH: '/home/thatguyzi/public_html/'
+    # Add other environment variables (DATABASE_URL, STRIPE_SECRET_KEY, etc.) here
+
+# Notes:
+# - Ensure your package.json has a "build" script (next build) and a "start" script (next start).
+# - If you use a process manager other than PM2 or a different start command, modify the start steps above.
+# - Avoid setting NODE_ENV to "production" before `npm ci` if devDependencies are required for building.
