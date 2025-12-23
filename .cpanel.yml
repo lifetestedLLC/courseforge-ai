@@ -1,0 +1,72 @@
+# cPanel App Deployment configuration for CourseForge (Next.js)
+# - Installs dependencies, builds the Next.js app, then starts it with PM2
+# - Customize environment variables under the "environment.variables" section
+
+deployment:
+  predeploy:
+    - echo "Predeploy: checking node & npm versions"
+    - node --version || true
+    - npm --version || true
+
+  tasks:
+    - echo "Installing dependencies"
+    - npm ci
+
+    - echo "Building Next.js app"
+    - npm run build
+
+    - echo "Setting NODE_ENV=production for run-time"
+    - export NODE_ENV=production
+
+    - echo "Ensure PM2 is available (use npx to avoid global install)"
+    - # prefer npx pm2 so global npm installs aren't required
+
+    - echo "Start or restart app with PM2"
+    - npx pm2 start npm --name "courseforge-ai" -- start || npx pm2 restart courseforge-ai || true
+    - npx pm2 save || true
+
+    - echo "Copy production artifacts to cPanel public_html (DEPLOYPATH configurable via environment)"
+    - DEPLOYPATH="${DEPLOYPATH:-$HOME/public_html}"
+    - echo "Using DEPLOYPATH=$DEPLOYPATH"
+    - mkdir -p "$DEPLOYPATH"
+    - echo "Syncing only production artifacts: .next/, public/, package.json, next.config.js, package-lock.json"
+    - if command -v rsync >/dev/null 2>&1; then \
+        rsync -av --delete --prune-empty-dirs \
+          --include='/.next/***' --include='/public/***' \
+          --include='/package.json' --include='/package-lock.json' --include='/next.config.js' \
+          --exclude='*' ./ "$DEPLOYPATH"; \
+      else \
+        mkdir -p "$DEPLOYPATH/.next" "$DEPLOYPATH/public"; \
+        /bin/cp -R .next "$DEPLOYPATH/" || true; \
+        /bin/cp -R public "$DEPLOYPATH/" || true; \
+        /bin/cp package.json "$DEPLOYPATH/" || true; \
+        /bin/cp package-lock.json "$DEPLOYPATH/" || true; \
+        /bin/cp next.config.js "$DEPLOYPATH/" || true; \
+      fi
+
+  postdeploy:
+    - echo "Postdeploy: listing PM2 processes"
+    - pm2 ls || true
+    - echo "Postdeploy: showing latest git commit"
+    - git --no-pager show -1 --name-only --pretty=format:'%h %s' HEAD
+    - git branch
+    - git remote show origin
+    - git push -u origin $(git branch --show-current)
+    - git push origin --delete error
+    - git ls-remote --heads origin
+
+environment:
+  variables:
+    NODE_ENV: production
+    PORT: '3000'
+    DEPLOYPATH: '/home/thatguyzi/public_html/'
+    # Add other environment variables (DATABASE_URL, STRIPE_SECRET_KEY, etc.) here
+
+# Notes:
+# - Ensure your package.json has a "build" script (next build) and a "start" script (next start).
+# - If you use a process manager other than PM2 or a different start command, modify the start steps above.
+# - Avoid setting NODE_ENV to "production" before `npm ci` if devDependencies are required for building.
+
+git add .cpanel.yml package.json
+git commit -m "chore(cpanel): use $HOME for DEPLOYPATH, use npx pm2, respect $PORT in start script" || echo "nothing to commit"
+
