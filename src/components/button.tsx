@@ -18,10 +18,7 @@ import React from 'react';
     className = '',
     ...props
   }) => {
-    const baseClasses = 'inline-flex items-center justify-center rounded-md text-s
-  m font-medium transition-colors focus-visible:outline-none focus-visible:ring-2
-  focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled
-  :pointer-events-none ring-offset-background';
+    const baseClasses = 'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background';
 
     const variantClasses = {
       primary: 'bg-blue-600 text-white hover:bg-blue-700',
@@ -35,8 +32,7 @@ import React from 'react';
       large: 'h-12 px-6 py-3 text-base'
     };
 
-    const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]
-  } ${className}`;
+    const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
 
     return (
       <button
