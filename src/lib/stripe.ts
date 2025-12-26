@@ -1,15 +1,22 @@
 import Stripe from 'stripe'
 import { StripeError, ValidationError, Logger } from './errors'
 
-// Validate Stripe secret key (allow build to pass without it)
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
-const isConfigured = !!process.env.STRIPE_SECRET_KEY
+// Validate Stripe secret key
+// In production, throw an error if not configured
+// In development/build, use placeholder to allow build to succeed
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY
+const isProduction = process.env.NODE_ENV === 'production'
 
-if (!isConfigured && typeof window === 'undefined') {
-  Logger.warn('STRIPE_SECRET_KEY is not configured - Stripe functionality will be limited')
+if (!stripeSecretKey) {
+  if (isProduction && typeof window === 'undefined') {
+    throw new Error('STRIPE_SECRET_KEY must be configured in production environment')
+  }
+  if (typeof window === 'undefined') {
+    Logger.warn('STRIPE_SECRET_KEY is not configured - Stripe functionality will be limited')
+  }
 }
 
-export const stripe = new Stripe(stripeSecretKey, {
+export const stripe = new Stripe(stripeSecretKey || 'sk_test_placeholder', {
   apiVersion: '2023-10-16',
   typescript: true,
   maxNetworkRetries: 3, // Add retry logic for network failures
