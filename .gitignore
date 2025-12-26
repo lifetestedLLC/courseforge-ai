@@ -87,6 +87,9 @@ pids/
 # Prisma
 prisma/migrations/
 
+# TypeScript
+*.tsbuildinfo
+
 # Test coverage
 coverage/
 .nyc_output

@@ -25,14 +25,15 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     setToasts((prev) => prev.filter((t) => t.id !== id))
   }, [])
 
-  const toast = React.useCallback((props: Omit<Toast, 'id'>) => {
-    const id = Math.random().toString(36).substring(2, 11)
-    setToasts((prev) => [...prev, { ...props, id }])
+  const toast = React.useCallback((props: Omit<Toast, 'id'> & { duration?: number }) => {
+    const { duration = 5000, ...toastProps } = props
+    const id = crypto.randomUUID()
+    setToasts((prev) => [...prev, { ...toastProps, id }])
     
-    // Auto dismiss after 5 seconds
+    // Auto dismiss after specified duration
     setTimeout(() => {
       dismiss(id)
-    }, 5000)
+    }, duration)
   }, [dismiss])
 
   return (
