@@ -30,7 +30,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     // Use crypto.randomUUID with fallback for older browsers
     const id = typeof crypto !== 'undefined' && crypto.randomUUID 
       ? crypto.randomUUID() 
-      : Math.random().toString(36).substring(2, 11)
+      : Math.random().toString(36).slice(2, 11)
     setToasts((prev) => [...prev, { ...toastProps, id }])
     
     // Auto dismiss after specified duration
