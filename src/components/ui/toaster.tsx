@@ -29,8 +29,9 @@ export function Toaster() {
             <button
               onClick={() => dismiss(toast.id)}
               className="text-gray-400 hover:text-gray-600"
+              aria-label="Close notification"
             >
-              ✕
+              &times;
             </button>
           </div>
           {toast.action && <div className="mt-3">{toast.action}</div>}
