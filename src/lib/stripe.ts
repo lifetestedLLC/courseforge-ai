@@ -1,13 +1,16 @@
 import Stripe from 'stripe'
 import { StripeError, ValidationError, Logger } from './errors'
 
-// Validate Stripe secret key
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY is not configured in environment variables')
+// Validate Stripe secret key (allow build to pass without it)
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
+const isConfigured = !!process.env.STRIPE_SECRET_KEY
+
+if (!isConfigured && typeof window === 'undefined') {
+  Logger.warn('STRIPE_SECRET_KEY is not configured - Stripe functionality will be limited')
 }
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-12-18.acacia', // Updated to latest stable version
+export const stripe = new Stripe(stripeSecretKey, {
+  apiVersion: '2023-10-16',
   typescript: true,
   maxNetworkRetries: 3, // Add retry logic for network failures
 })
@@ -191,35 +194,6 @@ export async function createCustomerPortalSession(
   const session = await stripe.billingPortal.sessions.create({
     customer: customerId,
     return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/account`,
-    configuration: {
-      features: {
-        subscription_update: {
-          enabled: true,
-          default_allowed_updates: ['price'],
-          products: [
-            {
-              product: process.env.STRIPE_STARTER_PRODUCT_ID || '',
-              prices: [process.env.STRIPE_STARTER_PRICE_ID || ''],
-            },
-            {
-              product: process.env.STRIPE_CREATOR_PRODUCT_ID || '',
-              prices: [process.env.STRIPE_CREATOR_PRICE_ID || ''],
-            },
-            {
-              product: process.env.STRIPE_BUSINESS_PRODUCT_ID || '',
-              prices: [process.env.STRIPE_BUSINESS_PRICE_ID || ''],
-            },
-          ],
-        },
-        subscription_cancel: {
-          enabled: true,
-          mode: 'immediately',
-        },
-        payment_method_update: {
-          enabled: true,
-        },
-      },
-    },
   })
   
   return session
