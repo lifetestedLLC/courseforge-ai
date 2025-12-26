@@ -27,7 +27,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
   const toast = React.useCallback((props: Omit<Toast, 'id'> & { duration?: number }) => {
     const { duration = 5000, ...toastProps } = props
-    const id = crypto.randomUUID()
+    // Use crypto.randomUUID with fallback for older browsers
+    const id = typeof crypto !== 'undefined' && crypto.randomUUID 
+      ? crypto.randomUUID() 
+      : Math.random().toString(36).substring(2, 11)
     setToasts((prev) => [...prev, { ...toastProps, id }])
     
     // Auto dismiss after specified duration

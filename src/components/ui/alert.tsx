@@ -27,7 +27,7 @@ const AlertDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className = '', ...props }, ref) => (
-  <div
+  <p
     ref={ref}
     className={`text-sm ${className}`}
     {...props}
