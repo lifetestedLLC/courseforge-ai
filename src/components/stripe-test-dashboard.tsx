@@ -14,7 +14,8 @@ import {
   CreditCard, 
   Settings,
   TestTube,
-  RefreshCw
+  RefreshCw,
+  Loader2
 } from 'lucide-react'
 
 interface TestResult {

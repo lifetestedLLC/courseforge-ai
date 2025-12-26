@@ -2,12 +2,22 @@ import Stripe from 'stripe'
 import { StripeError, ValidationError, Logger } from './errors'
 
 // Validate Stripe secret key
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY is not configured in environment variables')
+// In production, throw an error if not configured
+// In development/build, use placeholder to allow build to succeed
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY
+const isProduction = process.env.NODE_ENV === 'production'
+
+if (!stripeSecretKey) {
+  if (isProduction && typeof window === 'undefined') {
+    throw new Error('STRIPE_SECRET_KEY must be configured in production environment')
+  }
+  if (typeof window === 'undefined') {
+    Logger.warn('STRIPE_SECRET_KEY is not configured - Stripe functionality will be limited')
+  }
 }
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-12-18.acacia', // Updated to latest stable version
+export const stripe = new Stripe(stripeSecretKey || 'sk_test_placeholder', {
+  apiVersion: '2023-10-16',
   typescript: true,
   maxNetworkRetries: 3, // Add retry logic for network failures
 })
@@ -191,35 +201,6 @@ export async function createCustomerPortalSession(
   const session = await stripe.billingPortal.sessions.create({
     customer: customerId,
     return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/account`,
-    configuration: {
-      features: {
-        subscription_update: {
-          enabled: true,
-          default_allowed_updates: ['price'],
-          products: [
-            {
-              product: process.env.STRIPE_STARTER_PRODUCT_ID || '',
-              prices: [process.env.STRIPE_STARTER_PRICE_ID || ''],
-            },
-            {
-              product: process.env.STRIPE_CREATOR_PRODUCT_ID || '',
-              prices: [process.env.STRIPE_CREATOR_PRICE_ID || ''],
-            },
-            {
-              product: process.env.STRIPE_BUSINESS_PRODUCT_ID || '',
-              prices: [process.env.STRIPE_BUSINESS_PRICE_ID || ''],
-            },
-          ],
-        },
-        subscription_cancel: {
-          enabled: true,
-          mode: 'immediately',
-        },
-        payment_method_update: {
-          enabled: true,
-        },
-      },
-    },
   })
   
   return session

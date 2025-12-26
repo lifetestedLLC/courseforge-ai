@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { useToast } from '@/components/ui/use-toast'
-import { Loader2, CreditCard, Settings, AlertCircle, CheckCircle } from 'lucide-react'
+import { Loader2, CreditCard, Settings, AlertCircle, CheckCircle, X } from 'lucide-react'
 import { PLANS, PlanType, checkPlanLimits } from '@/lib/stripe'
 
 interface UsageData {
