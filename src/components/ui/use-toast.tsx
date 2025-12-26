@@ -12,7 +12,7 @@ export interface Toast {
 
 interface ToastContextValue {
   toasts: Toast[]
-  toast: (props: Omit<Toast, 'id'>) => void
+  toast: (props: Omit<Toast, 'id'> & { duration?: number }) => void
   dismiss: (id: string) => void
 }
 
