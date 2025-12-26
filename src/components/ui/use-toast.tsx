@@ -2,6 +2,8 @@
 
 import * as React from 'react'
 
+const FALLBACK_ID_LENGTH = 9
+
 export interface Toast {
   id: string
   title?: string
@@ -30,7 +32,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     // Use crypto.randomUUID with robust fallback for older browsers
     const id = typeof crypto !== 'undefined' && crypto.randomUUID 
       ? crypto.randomUUID() 
-      : `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
+      : `${Date.now()}-${Math.random().toString(36).slice(2, 2 + FALLBACK_ID_LENGTH)}`
     setToasts((prev) => [...prev, { ...toastProps, id }])
     
     // Auto dismiss after specified duration
