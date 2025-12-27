@@ -23,7 +23,7 @@ export default function PricingPageMinimal() {
               <p style={{ marginTop: '0.5rem', color: '#3b82f6', fontSize: '1.25rem' }}>$15/month</p>
             </div>
             <div style={{ padding: '1.5rem' }}>
-              <ul style={{ space: 'y-3', fontSize: '0.875rem' }}>
+              <ul style={{ fontSize: '0.875rem' }}>
                 <li style={{ marginBottom: '0.75rem' }}>✅ 3 AI-generated courses per month</li>
                 <li style={{ marginBottom: '0.75rem' }}>✅ Basic course templates</li>
                 <li style={{ marginBottom: '0.75rem' }}>✅ Standard video & text lessons</li>
@@ -51,7 +51,7 @@ export default function PricingPageMinimal() {
               </div>
             </div>
             <div style={{ padding: '1.5rem' }}>
-              <ul style={{ space: 'y-3', fontSize: '0.875rem' }}>
+              <ul style={{ fontSize: '0.875rem' }}>
                 <li style={{ marginBottom: '0.75rem' }}>✅ 15 AI-generated courses per month</li>
                 <li style={{ marginBottom: '0.75rem' }}>✅ Advanced course templates</li>
                 <li style={{ marginBottom: '0.75rem' }}>✅ All content formats</li>
@@ -76,7 +76,7 @@ export default function PricingPageMinimal() {
               <p style={{ marginTop: '0.5rem', color: '#7c3aed', fontSize: '1.25rem' }}>$79/month</p>
             </div>
             <div style={{ padding: '1.5rem' }}>
-              <ul style={{ space: 'y-3', fontSize: '0.875rem' }}>
+              <ul style={{ fontSize: '0.875rem' }}>
                 <li style={{ marginBottom: '0.75rem' }}>✅ Unlimited AI-generated courses</li>
                 <li style={{ marginBottom: '0.75rem' }}>✅ Premium templates & AI models</li>
                 <li style={{ marginBottom: '0.75rem' }}>✅ All content formats + live sessions</li>
