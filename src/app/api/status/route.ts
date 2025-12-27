@@ -4,16 +4,19 @@ import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { handleError, Logger } from '@/lib/errors'
 
+// Type for PLANS to avoid any
+type PlansType = typeof import('@/lib/stripe').PLANS | null
+
 // Dynamically import PLANS only when needed to avoid Stripe initialization errors
-let PLANS: any = null
-async function getPlans() {
+let PLANS: PlansType = null
+async function getPlans(): Promise<PlansType> {
   if (!PLANS) {
     try {
       const stripeModule = await import('@/lib/stripe')
       PLANS = stripeModule.PLANS
     } catch (error) {
       Logger.warn('Failed to import Stripe configuration', error)
-      PLANS = {}
+      PLANS = {} as PlansType
     }
   }
   return PLANS
@@ -68,13 +71,17 @@ export async function GET(req: NextRequest) {
 
     // Find plan based on price ID
     let plan = 'Free'
-    let planKey = null
+    let planKey: string | null = null
+    let planData = null
     
-    for (const [key, planData] of Object.entries(plans)) {
-      if (planData.stripePriceId === user.stripePriceId) {
-        plan = planData.name
-        planKey = key
-        break
+    if (plans) {
+      for (const [key, data] of Object.entries(plans as Record<string, any>)) {
+        if (data.stripePriceId === user.stripePriceId) {
+          plan = data.name
+          planKey = key
+          planData = data
+          break
+        }
       }
     }
 
@@ -116,8 +123,7 @@ export async function GET(req: NextRequest) {
     let coursesRemaining = 0
     let coursesLimit = 0
 
-    if (planKey && plans[planKey as keyof typeof plans]) {
-      const planData = plans[planKey as keyof typeof plans]
+    if (planData && planData.limits) {
       coursesLimit = planData.limits.coursesPerMonth
       
       if (coursesLimit > 0) {
@@ -154,9 +160,7 @@ export async function GET(req: NextRequest) {
           limit: coursesLimit,
         },
       },
-      limits: planKey && plans[planKey as keyof typeof plans] 
-        ? plans[planKey as keyof typeof plans].limits 
-        : null,
+      limits: planData && planData.limits ? planData.limits : null,
     }
 
     Logger.info('Status retrieved', { 
