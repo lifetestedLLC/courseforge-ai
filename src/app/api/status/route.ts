@@ -3,7 +3,21 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { handleError, Logger } from '@/lib/errors'
-import { PLANS } from '@/lib/stripe'
+
+// Dynamically import PLANS only when needed to avoid Stripe initialization errors
+let PLANS: any = null
+async function getPlans() {
+  if (!PLANS) {
+    try {
+      const stripeModule = await import('@/lib/stripe')
+      PLANS = stripeModule.PLANS
+    } catch (error) {
+      Logger.warn('Failed to import Stripe configuration', error)
+      PLANS = {}
+    }
+  }
+  return PLANS
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -42,6 +56,9 @@ export async function GET(req: NextRequest) {
       return new NextResponse('User not found', { status: 404 })
     }
 
+    // Get PLANS configuration
+    const plans = await getPlans()
+
     // Determine subscription status
     const isActive = Boolean(
       user.stripeSubscriptionId && 
@@ -53,7 +70,7 @@ export async function GET(req: NextRequest) {
     let plan = 'Free'
     let planKey = null
     
-    for (const [key, planData] of Object.entries(PLANS)) {
+    for (const [key, planData] of Object.entries(plans)) {
       if (planData.stripePriceId === user.stripePriceId) {
         plan = planData.name
         planKey = key
@@ -99,8 +116,8 @@ export async function GET(req: NextRequest) {
     let coursesRemaining = 0
     let coursesLimit = 0
 
-    if (planKey && PLANS[planKey as keyof typeof PLANS]) {
-      const planData = PLANS[planKey as keyof typeof PLANS]
+    if (planKey && plans[planKey as keyof typeof plans]) {
+      const planData = plans[planKey as keyof typeof plans]
       coursesLimit = planData.limits.coursesPerMonth
       
       if (coursesLimit > 0) {
@@ -137,8 +154,8 @@ export async function GET(req: NextRequest) {
           limit: coursesLimit,
         },
       },
-      limits: planKey && PLANS[planKey as keyof typeof PLANS] 
-        ? PLANS[planKey as keyof typeof PLANS].limits 
+      limits: planKey && plans[planKey as keyof typeof plans] 
+        ? plans[planKey as keyof typeof plans].limits 
         : null,
     }
 
