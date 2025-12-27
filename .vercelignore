@@ -1,0 +1,5 @@
+# Vercel ignore file
+# This file tells Vercel which files to ignore during deployment
+node_modules
+.git
+*.log
