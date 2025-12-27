@@ -38,6 +38,67 @@ This document provides comprehensive documentation for all working API endpoints
 }
 ```
 
+### Comprehensive Status
+**GET** `/api/status`
+
+**Description**: Get comprehensive system and user status including authentication, subscription, and usage information
+
+**Authentication**: Optional - Returns limited information when not authenticated
+
+**Response (Unauthenticated)**:
+```json
+{
+  "system": {
+    "online": true,
+    "timestamp": "2025-12-27T03:16:00.000Z",
+    "environment": "development"
+  },
+  "authenticated": false,
+  "message": "Not authenticated"
+}
+```
+
+**Response (Authenticated)**:
+```json
+{
+  "system": {
+    "online": true,
+    "timestamp": "2025-12-27T03:16:00.000Z",
+    "environment": "production"
+  },
+  "authenticated": true,
+  "user": {
+    "id": "user_id",
+    "email": "user@example.com",
+    "name": "User Name"
+  },
+  "subscription": {
+    "active": true,
+    "plan": "Creator",
+    "planKey": "CREATOR",
+    "currentPeriodEnd": "2026-01-27T03:16:00.000Z",
+    "subscriptionId": "sub_xxx"
+  },
+  "usage": {
+    "courses": {
+      "total": 12,
+      "published": 8,
+      "draft": 4,
+      "thisMonth": 3,
+      "remaining": 12,
+      "limit": 15
+    }
+  },
+  "limits": {
+    "coursesPerMonth": 15,
+    "modulesPerCourse": 12,
+    "lessonsPerModule": 10,
+    "videoMinutes": 300,
+    "storageGB": 50
+  }
+}
+```
+
 ## 💰 Stripe Integration
 
 ### Test Stripe Connection
